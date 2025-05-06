@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Scoreboard Overlay</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .overlay {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 30px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      font-size: 24px;
+    }
+
+    .team {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .score {
+      font-size: 48px;
+      font-weight: bold;
+    }
+
+    .timer {
+      font-size: 36px;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .controls input, .controls button {
+      margin: 2px;
+      font-size: 14px;
+    }
+
+    .hidden { /* This class was defined but not used in the original HTML structure */
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="overlay" id="overlay">
+    <div class="team" id="teamA">
+      <div id="teamAName">Team A</div>
+      <div class="score" id="scoreA">0</div>
+    </div>
+    <div class="timer" id="matchTimer">00:00</div>
+    <div class="team" id="teamB">
+      <div id="teamBName">Team B</div>
+      <div class="score" id="scoreB">0</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div>
+      <input type="text" id="nameA" placeholder="Team A Name">
+      <input type="text" id="nameB" placeholder="Team B Name">
+      <button onclick="updateNames()">Set Names</button>
+    </div>
+    <div>
+      <button onclick="changeScore('A', 1)">A +</button>
+      <button onclick="changeScore('A', -1)">A -</button>
+      <button onclick="changeScore('B', 1)">B +</button>
+      <button onclick="changeScore('B', -1)">B -</button>
+    </div>
+    <div>
+      <button onclick="startTimer()">Start</button>
+      <button onclick="pauseTimer()">Pause</button>
+      <button onclick="resetTimer()">Reset</button>
+    </div>
+  </div>
+
+  <script>
+    let scoreA = 0;
+    let scoreB = 0;
+    let seconds = 0;
+    let interval = null;
+
+    function updateNames() {
+      document.getElementById('teamAName').innerText = document.getElementById('nameA').value || "Team A";
+      document.getElementById('teamBName').innerText = document.getElementById('nameB').value || "Team B";
+    }
+
+    function changeScore(team, delta) {
+      if (team === 'A') {
+        scoreA = Math.max(0, scoreA + delta);
+        document.getElementById('scoreA').innerText = scoreA;
+      } else {
+        scoreB = Math.max(0, scoreB + delta);
+        document.getElementById('scoreB').innerText = scoreB;
+      }
+    }
+
+    function formatTime(secs) {
+      const m = String(Math.floor(secs / 60)).padStart(2, '0');
+      const s = String(secs % 60).padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function updateTimerDisplay() {
+      document.getElementById('matchTimer').innerText = formatTime(seconds);
+    }
+
+    function startTimer() {
+      if (interval) return; // Prevents multiple intervals if start is clicked again
+      interval = setInterval(() => {
+        seconds++;
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(interval);
+      interval = null; // Important to reset interval variable
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      seconds = 0;
+      updateTimerDisplay();
+    }
+
+    // Initialize timer display on page load
+    updateTimerDisplay();
+  </script>
+</body>
+</html>
